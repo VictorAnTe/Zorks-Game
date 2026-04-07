@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-//#include "World.h"
+#include "World.h"
 
 int main() {
     // Initialization of the world, we create one World that would contain a vector with each entity
-    /*World myWorld;*/
+    World myWorld;
 
     std::cout << "Welcome to Zork!" << std::endl;
     std::cout << "----------------" << std::endl;
@@ -23,11 +23,7 @@ int main() {
         }
         else {
             // World is the responsable of processing all the game logic and update entities
-            // Here I'm gonna call:
-            // myWorld.Update(userInput);
-            // To process the input and make the logic attached to this input in that room
-            // For the moment I'm gonna print it
-            std::cout << "You have writen: " << userInput << " (Processing...)" << std::endl;
+            myWorld.Update(userInput);
         }
     }
 
