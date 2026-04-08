@@ -74,25 +74,27 @@ World::World() {
     shed->contains.push_back(ex9);
     entities.push_back(ex9);
 
-    // CastleEntry -> Garden (West)
-    Exit* ex10 = new Exit("east", "The garden", "east", garden);
+    // CastleEntry -> InsideCastle (West)
+    Exit* ex10 = new Exit("west", "The castle door", "west", insideCastle);
     castleEntry->contains.push_back(ex10);
     entities.push_back(ex10);
 
-    // CastleEntry -> InsideCastle (East)
-    Exit* ex11 = new Exit("west", "The castle door", "west", insideCastle);
+    // CastleEntry -> Garden (East)
+    Exit* ex11 = new Exit("east", "The garden", "east", garden);
     castleEntry->contains.push_back(ex11);
     entities.push_back(ex11);
 
+    
+
     // Blocking exits
     ex7->locked = true; // You need to defeat Troll and Wood_Key
-    ex11->locked = true; // You need to solve a miniPuzzle
+    ex10->locked = true; // You need to solve a miniPuzzle
 
 
     // Create items
     Item* woodKey = new Item("wood_key", "An old wooden key.", livingRoom);
-    Item* apple = new Item("apple", "A crunchy red apple (+10 HP).", livingRoom);
-    Item* bandages = new Item("bandages", "Medical bandages for healing (+40 HP).", bathroom);
+    Item* apple = new Item("apple", "A crunchy red apple (+10 HP).", livingRoom, 0, 10);
+    Item* bandages = new Item("bandages", "Medical bandages for healing (+40 HP).", bathroom, 0, 40);
     Item* sword = new Item("sword", "A sharp steel sword (+15 DMG).", garden, 15);
     Item* spellsBook = new Item("spells_book", "A book glowing with ancient magic (+25 DMG).", shed, 25);
 
@@ -183,6 +185,14 @@ void World::Update(const std::string& input) {
         if (args.size() > 1) Battle(args[1]);
         else std::cout << "You need to specify who do you want to battle with" << std::endl;
     }
+    else if (action == "use") {
+        if (args.size() > 1) Use(args[1]);
+        else std::cout << "You need to specify what do you want to use from hero inventory" << std::endl;
+    }
+    else if (action == "solve") {
+        if (args.size() > 1) Solve(args[1]); // Answering the riddle
+        else Solve(""); // Showing the riddle
+    }
     else {
         std::cout << "This command is not registered. The options are:" << std::endl;
         std::cout << "   - look: To get information about the room you are." << std::endl;
@@ -193,6 +203,10 @@ void World::Update(const std::string& input) {
         std::cout << "   - inventory: Shows all the items from the hero inventory." << std::endl;
         std::cout << "   - equip {{item_name}}: To equip something from the hero inventory." << std::endl;
         std::cout << "   - battle {{npc_name}}: To battle someone in the currently room." << std::endl;
+        std::cout << "   - use {{item_name}}: To use something from the hero inventory." << std::endl;
+        std::cout << "   - solve: To get information about the riddle from the currently room." << std::endl;
+        std::cout << "   - solve {{riddle solution}}: To answer the riddle from the currently room." << std::endl;
+        std::cout << "   - quit: To close the game." << std::endl;
     }
 }
 
@@ -266,23 +280,30 @@ void World::Go(const std::string& direction) {
 
     // Block EXITs gestor
     if (ex->locked) {
-        bool has_key = false;
+        if (ex->destination->name == "Shed") {
+            bool has_key = false;
 
-        // We search the Wood_Key in the PLAYER "inventory"
-        for (Entity* item : player->contains) {
-            if (item->name == "wood_key") {
-                has_key = true;
-                break;
+            // We search the Wood_Key in the PLAYER "inventory"
+            for (Entity* item : player->contains) {
+                if (item->name == "wood_key") {
+                    has_key = true;
+                    break;
+                }
+            }
+
+            if (has_key) {
+                std::cout << "You use the wood_key to unlock the path to the Shed!" << std::endl;
+                ex->locked = false;
+            }
+            else {
+                std::cout << "The path to the Shed is locked. You need a key." << std::endl;
+                return;
             }
         }
-
-        if (has_key) {
-            std::cout << "You use the Wood_Key to unlock the path to the " << ex->destination->name << "!" << std::endl;
-            ex->locked = false;
-        }
-        else {
-            std::cout << "The way is locked. You might need a key or solve a puzzle first." << std::endl;
+        else if (ex->destination->name == "Inside Castle") {
+            std::cout << "The castle gate is sealed by magic. You must solve the puzzle first!" << std::endl;
             return;
+            // Here there is no key, unlock with "Solve" function
         }
     }
 
@@ -394,6 +415,33 @@ void World::Inventory() const {
 }
 
 
+void World::Equip(const std::string& item_name) {
+    Item* item_to_equip = nullptr;
+
+    // Search if the player contains that item
+    for (Entity* e : player->contains) {
+        if (e->name == item_name && e->type == EntityType::ITEM) {
+            item_to_equip = (Item*)e;
+            break;
+        }
+    }
+
+    if (item_to_equip == nullptr) {
+        std::cout << "You don't have that in your inventory." << std::endl;
+        return;
+    }
+
+    // Ensure the ITEM is a weapon
+    if (item_to_equip->damage_bonus > 0) {
+        // We pass the pointer
+        player->EquipWeapon(item_to_equip, item_to_equip->damage_bonus);
+    }
+    else {
+        std::cout << "The " << item_name << " is not a weapon!" << std::endl;
+    }
+}
+
+
 void World::Battle(const std::string& enemy_name) {
     Creature* enemy = nullptr;
 
@@ -421,11 +469,12 @@ void World::Battle(const std::string& enemy_name) {
         std::cout << "The " << enemy->name << " has been defeated!" << std::endl;
 
         //Dracula defeat logic: If you defeat Dracula, you win the game
-        if (enemy->name == "Dracula") {
+        if (enemy->name == "dracula") {
+            game_over = true;
             std::cout << "\n*** VICTORY! Dracula has fallen. The castle is free! ***" << std::endl;
         }
 
-        // Eliminar al enemigo de la habitación (pero no de 'entities' para que no explote la memoria)
+        // Delete enemy from the ROOM but not from entities to avoid memory problems
         player->location->contains.remove(enemy);
     }
     else {
@@ -434,6 +483,7 @@ void World::Battle(const std::string& enemy_name) {
         player->TakeDamage(enemy->GetPower());
 
         if (player->GetHealth() <= 0) {
+            game_over = true;
             std::cout << "You have been slain... GAME OVER." << std::endl;
         }
         else {
@@ -443,29 +493,77 @@ void World::Battle(const std::string& enemy_name) {
 }
 
 
-void World::Equip(const std::string& item_name) {
-    Item* item_to_equip = nullptr;
+void World::Use(const std::string& item_name) {
+    Item* item = nullptr;
 
-    // Search if the player contains that item
+    // Search in "inventory"
     for (Entity* e : player->contains) {
         if (e->name == item_name && e->type == EntityType::ITEM) {
-            item_to_equip = (Item*)e;
+            item = (Item*)e;
             break;
         }
     }
 
-    if (item_to_equip == nullptr) {
-        std::cout << "You don't have that in your inventory." << std::endl;
+    if (item == nullptr) {
+        std::cout << "You don't have " << item_name << " in your inventory." << std::endl;
         return;
     }
 
-    // Ensure the ITEM is a weapon
-    if (item_to_equip->damage_bonus > 0) {
-        // We pass the pointer
-        player->EquipWeapon(item_to_equip, item_to_equip->damage_bonus);
+    // Validating if it is consumable
+    if (item->hp_bonus > 0) {
+        player->RestoreHealth(item->hp_bonus);
+        std::cout << "You used the " << item->name << "." << std::endl;
+
+        // Erasing the object that is consumed
+        player->contains.remove(item);
+        auto it = std::find(entities.begin(), entities.end(), item);
+        if (it != entities.end()) {
+            entities.erase(it);
+        }
+        delete item;
     }
     else {
-        std::cout << "The " << item_name << " is not a weapon!" << std::endl;
+        std::cout << "The " << item_name << " cannot be used this way." << std::endl;
+    }
+}
+
+void World::Solve(const std::string& riddle_answer) const
+{
+    // The hero is not in the castle entry
+    if (player->location->name != "Castle Entry") {
+        std::cout << "There is no puzzle to solve here." << std::endl;
+        return;
+    }
+
+    // Showing riddle case
+    if (riddle_answer.empty()) {
+        std::cout << "\n--- THE CASTLE RIDDLE ---" << std::endl;
+        std::cout << "I live in a castle, but I am not a king.\n"
+            << "I drink red liquid, but I am not a nurse.\n"
+            << "I sleep in a coffin, but I am not dead.\n"
+            << "Who am I? (Type: solve [answer])" << std::endl;
+        return;
+    }
+
+    // Answering the riddle
+    if (riddle_answer == "dracula" || riddle_answer == "vampire") {
+        // Unlock the path to the Inside Castle
+        for (Entity* e : player->location->contains) {
+            if (e->type == EntityType::EXIT && e->name == "west") {
+                Exit* ex = (Exit*)e;
+                if (ex->locked) {
+                    ex->locked = false;
+                    std::cout << "\n[!] The magic seal shatters! The castle gates open slowly..." << std::endl;
+                }
+                else {
+                    std::cout << "The gates are already open." << std::endl;
+                }
+                return;
+            }
+        }
+    }
+    else {
+        std::cout << "That is not the correct answer. The shadows laugh at you..." << std::endl;
     }
 }
 

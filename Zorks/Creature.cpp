@@ -23,7 +23,7 @@ void Creature::RestoreHealth(const int hp_rest)
 {
     health += hp_rest;
 
-    // Si la salud actual supera la máxima, la igualamos a la máxima
+    // If health is greater than max_health we put health as the max_health value
     if (health > max_health) {
         health = max_health;
     }

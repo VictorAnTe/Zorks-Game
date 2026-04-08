@@ -11,17 +11,13 @@ int main() {
     bool isRunning = true;
 
     // Game Loop
-    while (isRunning) {
+    while (myWorld.game_over == false) {
         std::cout << "\n> ";
         std::getline(std::cin, userInput);
 
-        if (userInput == "quit") {
-            isRunning = false;
-        }
-        else {
-            // World is the responsable of processing all the game logic and update entities
-            myWorld.Update(userInput);
-        }
+        if (userInput == "quit") break;
+
+        myWorld.Update(userInput);
     }
 
     std::cout << "\nThanks for playing!" << std::endl;

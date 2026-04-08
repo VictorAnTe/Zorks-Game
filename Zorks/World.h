@@ -14,6 +14,8 @@ public:
     World();  // Constructor
     ~World(); // Destructor
 
+    bool game_over = false;
+
     void Update(const std::string& input); // Decides which function is needed to call
 
 private:
@@ -23,8 +25,11 @@ private:
     void Take(const std::string& item_name);
     void Drop(const std::string& item_name);
     void Inventory() const;
-    void Battle(const std::string& enemy_name);
     void Equip(const std::string& item_name);
+    void Battle(const std::string& enemy_name);
+    void Use(const std::string& item_name);
+    void Solve(const std::string& riddle_answer) const;
+    
 
     // Utils
     Entity* FindEntity(const std::string& name) const;
