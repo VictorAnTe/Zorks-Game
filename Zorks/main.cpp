@@ -7,9 +7,6 @@ int main() {
     // Initialization of the world, we create one World that would contain a vector with each entity
     World myWorld;
 
-    std::cout << "Welcome to Zork!" << std::endl;
-    std::cout << "----------------" << std::endl;
-
     std::string userInput;
     bool isRunning = true;
 
