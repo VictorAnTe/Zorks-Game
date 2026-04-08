@@ -16,8 +16,16 @@ public:
     Room* location;
 
     // Possible interesting methods
+    // void TakeDamage(const int)
+    // void RestoreHealth(const int)
     // virtual void Die();
     // virtual void MoveTo(Room* destination);
+
+    // int GetHealth() const
+    // int GetPower() const
+
+    // private int health;
+    // private int power;
 };
 
 #endif // CREATURE_H
