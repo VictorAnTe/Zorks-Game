@@ -11,6 +11,9 @@ public:
 
     std::string direction;
     Room* destination;
+
+    bool locked = false;
+    std::string key_name = "";
 };
 
 #endif

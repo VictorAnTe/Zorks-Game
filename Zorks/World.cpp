@@ -10,38 +10,122 @@
 // Constructor
 World::World() {
     // Create rooms
-    Room* house = new Room("House", "You are in a small but cozy house. There is a door at north.");
-    Room* garden = new Room("Garden", "A garden plenty of flowers. At north you can see a forest and to the south is the house.");
-    Room* forest = new Room("Forest", "A dense forest. You can only go to the south, back to the garden.");
+    Room* livingRoom = new Room("Livingroom", "A cozy living room. The start of your journey.");
+    Room* bathroom = new Room("Bathroom", "A clean bathroom. You see some bandages here.");
+    Room* garden = new Room("Garden", "A large garden. You can see the forest to the North.");
+    Room* forest = new Room("Forest", "A dark and scary forest. A Troll blocks the way North!");
+    Room* shed = new Room("Shed", "A small wooden shed. It's very quiet here.");
+    Room* castleEntry = new Room("Castle Entry", "The massive gates of the castle stand before you.");
+    Room* insideCastle = new Room("Inside Castle", "Dracula's throne room. There is no escape!");
 
-    // Add to the global memory vector
-    entities.push_back(house);
+    // Add ROOMs to the global memory vector
+    entities.push_back(livingRoom);
+    entities.push_back(bathroom);
     entities.push_back(garden);
     entities.push_back(forest);
+    entities.push_back(shed);
+    entities.push_back(castleEntry);
+    entities.push_back(insideCastle);
+
 
     // Create Exits
-    // House -> Garden (North)
+    // Livingroom -> Garden (North)
     Exit* ex1 = new Exit("north", "A wooden door", "north", garden);
-    house->contains.push_back(ex1);
+    livingRoom->contains.push_back(ex1);
     entities.push_back(ex1);
 
-    // Garden -> House (South)
-    Exit* ex2 = new Exit("south", "The house entrance", "south", house);
-    garden->contains.push_back(ex2);
+    // Livingroom -> Bathroom (East)
+    Exit* ex2 = new Exit("east", "A glass door", "east", bathroom);
+    livingRoom->contains.push_back(ex2);
     entities.push_back(ex2);
 
-    // Garden -> Forest (North)
-    Exit* ex3 = new Exit("north", "A narrow path", "north", forest);
-    garden->contains.push_back(ex3);
+    // Bathroom -> Livingroom (West)
+    Exit* ex3 = new Exit("west", "The livingroom of the house", "west", livingRoom);
+    bathroom->contains.push_back(ex3);
     entities.push_back(ex3);
 
-    // Forest -> Garden (South)
-    Exit* ex4 = new Exit("south", "The way back", "south", garden);
-    forest->contains.push_back(ex4);
+    // Garden -> Forest (North)
+    Exit* ex4 = new Exit("north", "A narrow path", "north", forest);
+    garden->contains.push_back(ex4);
     entities.push_back(ex4);
 
-    // Creating Player
-    player = new Player("Hero", "The main character of this story", house);
+    // Garden -> castleEntry (West)
+    Exit* ex5 = new Exit("west", "A cobbled path", "west", castleEntry);
+    garden->contains.push_back(ex5);
+    entities.push_back(ex5);
+
+    // Garden -> Livingroom (South)
+    Exit* ex6 = new Exit("south", "The livingroom of the house", "south", livingRoom);
+    garden->contains.push_back(ex6);
+    entities.push_back(ex6);
+
+    // Forest -> Shed (North)
+    Exit* ex7 = new Exit("north", "A gloomy shed", "north", shed);
+    forest->contains.push_back(ex7);
+    entities.push_back(ex7);
+
+    // Forest -> Garden (South)
+    Exit* ex8 = new Exit("south", "The garden", "south", garden);
+    forest->contains.push_back(ex8);
+    entities.push_back(ex8);
+
+    // Shed -> Forest (South)
+    Exit* ex9 = new Exit("south", "The forest", "south", forest);
+    shed->contains.push_back(ex9);
+    entities.push_back(ex9);
+
+    // CastleEntry -> Garden (West)
+    Exit* ex10 = new Exit("east", "The garden", "east", garden);
+    castleEntry->contains.push_back(ex10);
+    entities.push_back(ex10);
+
+    // CastleEntry -> InsideCastle (East)
+    Exit* ex11 = new Exit("west", "The castle door", "west", insideCastle);
+    castleEntry->contains.push_back(ex11);
+    entities.push_back(ex11);
+
+    // Blocking exits
+    ex7->locked = true; // You need to defeat Troll and Wood_Key
+    ex11->locked = true; // You need to solve a miniPuzzle
+
+
+    // Create items
+    Item* woodKey = new Item("wood_key", "An old wooden key.", livingRoom);
+    Item* apple = new Item("apple", "A crunchy red apple (+10 HP).", livingRoom);
+    Item* bandages = new Item("bandages", "Medical bandages for healing (+40 HP).", bathroom);
+    Item* sword = new Item("sword", "A sharp steel sword (+15 DMG).", garden, 15);
+    Item* spellsBook = new Item("spells_book", "A book glowing with ancient magic (+25 DMG).", shed, 25);
+
+    // Add ITEMs to the global memory vector
+    entities.push_back(woodKey);
+    entities.push_back(apple);
+    entities.push_back(bandages);
+    entities.push_back(sword);
+    entities.push_back(spellsBook);
+
+    // Add ITEMs to contains list of ROOMs
+    livingRoom->contains.push_back(woodKey);
+    livingRoom->contains.push_back(apple);
+    bathroom->contains.push_back(bandages);
+    garden->contains.push_back(sword);
+    shed->contains.push_back(spellsBook);
+
+
+    // Create NPCs
+    Creature* troll = new Creature("troll", "A massive and stinky troll blocking the way.", forest, 10);
+    Creature* dracula = new Creature("dracula", "The ancient vampire lord.", insideCastle, 20);
+
+    // Add NPCs to the global memory vector
+    entities.push_back(troll);
+    entities.push_back(dracula);
+
+    // Add NPCs to contains list of ROOMs
+    forest->contains.push_back(troll);
+    insideCastle->contains.push_back(dracula);
+
+
+    // Create Player
+    player = new Player("Hero", "The main character of this story", livingRoom);
     entities.push_back(player);
 
     // Mensaje inicial
@@ -78,18 +162,26 @@ void World::Update(const std::string& input) {
     }
     else if (action == "go") {
         if (args.size() > 1) Go(args[1]);
-        else std::cout << "Where do you wanna go?" << std::endl;
+        else std::cout << "You need to specify where do you want to go (north, east, south, east)" << std::endl;
     }
     else if (action == "get") {
         if (args.size() > 1) Take(args[1]);
-        else std::cout << "What do you wanna pick?" << std::endl;
+        else std::cout << "You need to specify what do you want to pick" << std::endl;
     }
     else if (action == "drop") {
         if (args.size() > 1) Drop(args[1]);
-        else std::cout << "What do you wanna drop?" << std::endl;
+        else std::cout << "You need to specify what do you want to drop?" << std::endl;
     }
     else if (action == "inventory") {
         Inventory();
+    }
+    else if (action == "equip") {
+        if (args.size() > 1) Equip(args[1]);
+        else std::cout << "You need to specify what do you want to equip?" << std::endl;
+    }
+    else if (action == "battle") {
+        if (args.size() > 1) Battle(args[1]);
+        else std::cout << "You need to specify who do you want to battle with" << std::endl;
     }
     else {
         std::cout << "This command is not registered. The options are:" << std::endl;
@@ -99,6 +191,8 @@ void World::Update(const std::string& input) {
         std::cout << "   - get {{item_name}}: To pick the object specified from the floor." << std::endl;
         std::cout << "   - drop {{item_name}}: To leave an object from your inventory." << std::endl;
         std::cout << "   - inventory: Shows all the items from the hero inventory." << std::endl;
+        std::cout << "   - equip {{item_name}}: To equip something from the hero inventory." << std::endl;
+        std::cout << "   - battle {{npc_name}}: To battle someone in the currently room." << std::endl;
     }
 }
 
@@ -149,20 +243,61 @@ void World::Look(const std::string& target_name) const {
 
 
 void World::Go(const std::string& direction) {
-    // We search if this direction exists in this room
+    // Search if this direction exists in this room
     Entity* e = FindEntity(direction);
 
-    // If it is not null and is and exit type it means
-    // that it is a real exit of the room
-    if (e != nullptr && e->type == EntityType::EXIT) {
-        Exit* ex = (Exit*)e;
-        player->location = ex->destination;
-        Look();
+    // Validating that it is an EXIT
+    if (e == nullptr || e->type != EntityType::EXIT) {
+        std::cout << "You can't go '" << direction << "'. There is no exit there." << std::endl;
         return;
     }
 
-    // If it isn't an exit or it doesn't exists
-    std::cout << "You can't go to the " << direction << ", there is no exit." << std::endl;
+    Exit* ex = (Exit*)e;
+
+    // If you try to go to the Shed without defeating Troll
+    if (direction == "north") {
+        for (Entity* roomEntity : player->location->contains) {
+            if (roomEntity->type == EntityType::CREATURE && roomEntity != player) {
+                std::cout << "The " << roomEntity->name << " blocks your way! You must defeat it first." << std::endl;
+                return;
+            }
+        }
+    }
+
+    // Block EXITs gestor
+    if (ex->locked) {
+        bool has_key = false;
+
+        // We search the Wood_Key in the PLAYER "inventory"
+        for (Entity* item : player->contains) {
+            if (item->name == "wood_key") {
+                has_key = true;
+                break;
+            }
+        }
+
+        if (has_key) {
+            std::cout << "You use the Wood_Key to unlock the path to the " << ex->destination->name << "!" << std::endl;
+            ex->locked = false;
+        }
+        else {
+            std::cout << "The way is locked. You might need a key or solve a puzzle first." << std::endl;
+            return;
+        }
+    }
+
+    // Moving the PLAYER
+    // Remove from the currently ROOM
+    player->location->contains.remove(player);
+
+    // Adding to next ROOM
+    player->location = ex->destination; 
+    player->location->contains.push_back(player);
+
+    // Look of the next room
+    std::cout << "You walk towards the " << direction << "..." << std::endl;
+    std::cout << "------------------------------------------" << std::endl;
+    Look();
 }
 
 
@@ -258,6 +393,81 @@ void World::Inventory() const {
     std::cout << std::endl;
 }
 
+
+void World::Battle(const std::string& enemy_name) {
+    Creature* enemy = nullptr;
+
+    // Search de NPCs in the currently ROOM
+    for (Entity* e : player->location->contains) {
+        if (e->type == EntityType::CREATURE && e->name == enemy_name) {
+            enemy = (Creature*)e;
+            break;
+        }
+    }
+
+    if (enemy == nullptr || enemy == player) {
+        std::cout << "There is no " << enemy_name << " here to attack." << std::endl;
+        return;
+    }
+
+    // Turn by Turn combat
+    std::cout << "\n--- COMBAT! ---" << std::endl;
+
+    // Player attacks first
+    std::cout << "You attack the " << enemy->name << " for " << player->GetPower() << " damage!" << std::endl;
+    enemy->TakeDamage(player->GetPower());
+
+    if (enemy->GetHealth() <= 0) {
+        std::cout << "The " << enemy->name << " has been defeated!" << std::endl;
+
+        //Dracula defeat logic: If you defeat Dracula, you win the game
+        if (enemy->name == "Dracula") {
+            std::cout << "\n*** VICTORY! Dracula has fallen. The castle is free! ***" << std::endl;
+        }
+
+        // Eliminar al enemigo de la habitación (pero no de 'entities' para que no explote la memoria)
+        player->location->contains.remove(enemy);
+    }
+    else {
+        // Enemy attack
+        std::cout << "The " << enemy->name << " counter-attacks! You lose " << enemy->GetPower() << " HP." << std::endl;
+        player->TakeDamage(enemy->GetPower());
+
+        if (player->GetHealth() <= 0) {
+            std::cout << "You have been slain... GAME OVER." << std::endl;
+        }
+        else {
+            std::cout << "Your HP: " << player->GetHealth() << " | " << enemy->name << " HP: " << enemy->GetHealth() << std::endl;
+        }
+    }
+}
+
+
+void World::Equip(const std::string& item_name) {
+    Item* item_to_equip = nullptr;
+
+    // Search if the player contains that item
+    for (Entity* e : player->contains) {
+        if (e->name == item_name && e->type == EntityType::ITEM) {
+            item_to_equip = (Item*)e;
+            break;
+        }
+    }
+
+    if (item_to_equip == nullptr) {
+        std::cout << "You don't have that in your inventory." << std::endl;
+        return;
+    }
+
+    // Ensure the ITEM is a weapon
+    if (item_to_equip->damage_bonus > 0) {
+        // We pass the pointer
+        player->EquipWeapon(item_to_equip, item_to_equip->damage_bonus);
+    }
+    else {
+        std::cout << "The " << item_name << " is not a weapon!" << std::endl;
+    }
+}
 
 
 // HELPERS METHODS

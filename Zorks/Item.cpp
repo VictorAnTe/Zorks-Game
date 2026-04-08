@@ -1,10 +1,11 @@
 #include "Item.h"
 
 // Constructor
-Item::Item(const std::string& name, const std::string& description, Entity* parent) :
+Item::Item(const std::string& name, const std::string& description, Entity* parent, int dmg) :
     Entity(name, description, parent)
 {
-    type = EntityType::ITEM;
+    this->type = EntityType::ITEM;
+    this->damage_bonus = dmg;
 
     // Future variables initialization:
     // can_be_eaten = false;

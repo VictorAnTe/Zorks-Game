@@ -23,6 +23,8 @@ private:
     void Take(const std::string& item_name);
     void Drop(const std::string& item_name);
     void Inventory() const;
+    void Battle(const std::string& enemy_name);
+    void Equip(const std::string& item_name);
 
     // Utils
     Entity* FindEntity(const std::string& name) const;
