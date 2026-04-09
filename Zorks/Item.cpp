@@ -1,12 +1,11 @@
 #include "Item.h"
 
 // Constructor
-Item::Item(const std::string& name, const std::string& description, Entity* parent, int dmg, int hp) :
+Item::Item(const std::string& name, const std::string& description, Entity* parent) :
     Entity(name, description, parent)
 {
     this->type = EntityType::ITEM;
-    this->damage_bonus = dmg;
-    this->hp_bonus = hp;
+    this->item_type = ItemType::DEFAULT; // Default type
 }
 
 // Destructor

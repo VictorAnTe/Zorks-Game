@@ -1,14 +1,16 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <vector>
+#include <list>
 #include <string>
 #include "Entity.h"
 #include "Player.h"
+#include "Puzzle.h"
 
 class World {
 public:
-    std::vector<Entity*> entities; // The vector with all the instancies
+    std::list<Entity*> entities; // The vector with all the instancies
+    std::vector<Puzzle*> puzzles; // The vector with all the puzzles
     Player* player;                // Fast pointer to avoid searching the player all the time
 
     World();  // Constructor
@@ -28,7 +30,7 @@ private:
     void Equip(const std::string& item_name);
     void Battle(const std::string& enemy_name);
     void Use(const std::string& item_name);
-    void Solve(const std::string& riddle_answer) const;
+    void Solve(const std::string& riddle_answer);
     
 
     // Utils
