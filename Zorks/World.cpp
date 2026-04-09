@@ -9,6 +9,7 @@
 #include "ConsumableItem.h"
 #include "WeaponItem.h"
 #include "Puzzle.h"
+#include "Container.h"
 
 
 // Constructor
@@ -107,30 +108,41 @@ World::World() {
 
     // Create ITEMs
 
+    // - Containers
+    Container* chest = new Container("chest", "An old chest.", shed);
+    Container* medicineCabinet = new Container("medicine_cabinet", "An plastic medicine cabinet.", bathroom);
+
     // - Keys (Linked to their specific exits)
     Item* woodKey = new KeyItem("wood_key", "An old wooden key.", livingRoom, ex7);
 
     // - Consumables (Name, Description, Parent, HP_Bonus)
     Item* apple = new ConsumableItem("apple", "A crunchy red apple (+10 HP).", livingRoom, 10);
-    Item* bandages = new ConsumableItem("bandages", "Medical bandages for healing (+40 HP).", bathroom, 40);
+    Item* bandages = new ConsumableItem("bandages", "Medical bandages for healing (+40 HP).", medicineCabinet, 40);
 
     // - Weapons (Name, Description, Parent, DMG_Bonus)
     Item* sword = new WeaponItem("sword", "A sharp steel sword (+15 DMG).", garden, 15);
-    Item* spellsBook = new WeaponItem("spells_book", "A book glowing with ancient magic (+25 DMG).", shed, 25);
+    Item* spellsBook = new WeaponItem("spells_book", "A book glowing with ancient magic (+25 DMG).", chest, 25);
 
     // Add ITEMs to the global memory vector
+    entities.push_back(chest);
+    entities.push_back(medicineCabinet);
     entities.push_back(woodKey);
     entities.push_back(apple);
     entities.push_back(bandages);
     entities.push_back(sword);
     entities.push_back(spellsBook);
 
-    // Add ITEMs to contains list of ROOMs
+
+    /* Add ITEMs to contains list of ROOMs
     livingRoom->contains.push_back(woodKey);
     livingRoom->contains.push_back(apple);
-    bathroom->contains.push_back(bandages);
+    bathroom->contains.push_back(medicineCabinet);
     garden->contains.push_back(sword);
-    shed->contains.push_back(spellsBook);
+    shed->contains.push_back(chest);
+    
+    
+    Now is done at the constructor
+    */
 
 
     // Create NPCs
@@ -178,14 +190,12 @@ void World::Update(const std::string& input) {
     std::string action = args[0];
 
     if (action == "look") {
-        if (args.size() > 1) {
+        if (args.size() > 1)
             // With an argument: look sword, look hero, look north
             Look(args[1]);
-        }
-        else {
+        else
             // Without argument
             Look();
-        }
     }
     else if (action == "go") {
         if (args.size() > 1) Go(args[1]);
@@ -218,6 +228,10 @@ void World::Update(const std::string& input) {
         if (args.size() > 1) Solve(args[1]); // Answering the riddle
         else Solve(""); // Showing the riddle
     }
+    else if (action == "open") {
+        if (args.size() > 1) Open(args[1]);
+        else std::cout << "You need to specify which item do you want to open from hero inventory or room" << std::endl;
+    }
     else {
         std::cout << "This command is not registered. The options are:" << std::endl;
         std::cout << "   - look: To get information about the room you are." << std::endl;
@@ -231,6 +245,7 @@ void World::Update(const std::string& input) {
         std::cout << "   - use {{item_name}}: To use something from the hero inventory." << std::endl;
         std::cout << "   - solve: To get information about the riddle from the currently room." << std::endl;
         std::cout << "   - solve {{riddle solution}}: To answer the riddle from the currently room." << std::endl;
+        std::cout << "   - open {{item_name}}: To open an item and getting all the items inside of it in the inventory." << std::endl;
         std::cout << "   - quit: To close the game." << std::endl;
     }
 }
@@ -545,6 +560,44 @@ void World::Solve(const std::string& riddle_answer) {
         else {
             std::cout << "That is not the correct answer. The shadows laugh at you..." << std::endl;
         }
+    }
+}
+
+
+void World::Open(const std::string& target_name) {
+    // Find del ITEM
+    Entity* target = FindEntity(target_name);
+
+    if (!target) {
+        std::cout << "The item'" << target_name << "' is not here." << std::endl;
+        return;
+    }
+
+    // Verifying it is a CONTAINER
+    if (target->type == EntityType::ITEM && ((Item*)target)->item_type == ItemType::CONTAINER) {
+
+        if (target->contains.empty()) {
+            std::cout << "You open the " << target->name << ", but it is empty." << std::endl;
+        }
+        else {
+            std::cout << "You open " << target->name << ", inside you find:" << std::endl;
+
+            // Usamos un iterador para vaciar la caja de forma segura
+            auto it = target->contains.begin();
+            while (it != target->contains.end()) {
+                Entity* itemInside = *it;
+                std::cout << " - [" << itemInside->name << "] added to hero inventory." << std::endl;
+
+                // Actualizamos la jerarquía
+                player->contains.push_back(itemInside);
+                itemInside->parent = player;
+
+                it = target->contains.erase(it);
+            }
+        }
+    }
+    else {
+        std::cout << "That is not able to be opened." << std::endl;
     }
 }
 

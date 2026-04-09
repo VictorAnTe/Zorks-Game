@@ -7,7 +7,8 @@ enum class ItemType {
     DEFAULT,
     CONSUMABLE,
     KEY,
-    WEAPON
+    WEAPON,
+    CONTAINER
 };
 
 class Item : public Entity {

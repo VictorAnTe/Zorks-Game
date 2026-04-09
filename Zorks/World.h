@@ -31,6 +31,7 @@ private:
     void Battle(const std::string& enemy_name);
     void Use(const std::string& item_name);
     void Solve(const std::string& riddle_answer);
+    void Open(const std::string& target_name);
     
 
     // Utils
@@ -38,4 +39,4 @@ private:
     std::vector<std::string> ParseCommand(const std::string& input) const;
 };
 
-#endif
+#endif // WORLD_H

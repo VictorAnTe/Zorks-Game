@@ -15,4 +15,4 @@ public:
     bool locked = false;
 };
 
-#endif
+#endif // EXIT_H

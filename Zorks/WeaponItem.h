@@ -11,4 +11,4 @@ public:
     int damage_bonus;
 };
 
-#endif
+#endif // WEAPONITEM_H
