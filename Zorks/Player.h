@@ -12,14 +12,14 @@ public:
     // Destructor
     virtual ~Player();
 
+    Item* GetItem(const std::string& name);
+
     void EquipWeapon(Item* new_weapon, int new_dmg);
-    std::string GetWeapon() const { if(equipped_weapon != nullptr) return equipped_weapon->name; }
-
-    // Adding functions such as:
-    // void AttackNPC(const std::string& npc_name)
-    // bool UseItem(const std::string& item_name)
-
-    
+    std::string GetWeapon() const;
+    int GetAttackDamage() const override {
+        return power + (equipped_weapon ? weapon_damage : 0);
+    }
+    void RestoreHealth(int amount) override;    
 
 private:
     Item* equipped_weapon = nullptr;

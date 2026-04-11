@@ -10,15 +10,17 @@
 #include "WeaponItem.h"
 #include "Puzzle.h"
 #include "Container.h"
+#include "Troll.h"
+#include "Dracula.h"
 
 
 // Constructor
 World::World() {
     // Create ROOMs
     Room* livingRoom = new Room("Livingroom", "A cozy living room. The start of your journey.");
-    Room* bathroom = new Room("Bathroom", "A clean bathroom. You see some bandages here.");
+    Room* bathroom = new Room("Bathroom", "A clean bathroom. You see a medicine_cabinet in a wall.");
     Room* garden = new Room("Garden", "A large garden. You can see the forest to the North.");
-    Room* forest = new Room("Forest", "A dark and scary forest. A Troll blocks the way North!");
+    Room* forest = new Room("Forest", "A dark and scary forest. A Troll blocks the paths!");
     Room* shed = new Room("Shed", "A small wooden shed. It's very quiet here.");
     Room* castleEntry = new Room("Castle Entry", "The massive gates of the castle stand before you.");
     Room* insideCastle = new Room("Inside Castle", "Dracula's throne room. There is no escape!");
@@ -97,7 +99,7 @@ World::World() {
 
     // Create PUZZLE
     std::string dracula_riddle = "I live in a castle, but I am not a king.\n"
-        "I drink red liquid, but I am not a nurse.\n"
+        "I am used to blood, but I am not a nurse.\n"
         "I sleep in a coffin, but I am not dead.\n"
         "Who am I?";
 
@@ -133,21 +135,9 @@ World::World() {
     entities.push_back(spellsBook);
 
 
-    /* Add ITEMs to contains list of ROOMs
-    livingRoom->contains.push_back(woodKey);
-    livingRoom->contains.push_back(apple);
-    bathroom->contains.push_back(medicineCabinet);
-    garden->contains.push_back(sword);
-    shed->contains.push_back(chest);
-    
-    
-    Now is done at the constructor
-    */
-
-
     // Create NPCs
-    Creature* troll = new Creature("troll", "A massive and stinky troll blocking the way.", forest, 10);
-    Creature* dracula = new Creature("dracula", "The ancient vampire lord.", insideCastle, 20);
+    Creature* troll = new Troll("troll", "A massive and stinky troll blocking the way.", forest);
+    Creature* dracula = new Dracula("dracula", "The ancient vampire lord.", insideCastle);
 
     // Add NPCs to the global memory vector
     entities.push_back(troll);
@@ -232,6 +222,10 @@ void World::Update(const std::string& input) {
         if (args.size() > 1) Open(args[1]);
         else std::cout << "You need to specify which item do you want to open from hero inventory or room" << std::endl;
     }
+    else if (action == "save") {
+        if (args.size() > 2) PutItemIn(args[1], args[2]);
+        else std::cout << "You need to specify two items, which item do you want to save from hero inventory and where do you want to save" << std::endl;
+    }
     else {
         std::cout << "This command is not registered. The options are:" << std::endl;
         std::cout << "   - look: To get information about the room you are." << std::endl;
@@ -246,6 +240,7 @@ void World::Update(const std::string& input) {
         std::cout << "   - solve: To get information about the riddle from the currently room." << std::endl;
         std::cout << "   - solve {{riddle solution}}: To answer the riddle from the currently room." << std::endl;
         std::cout << "   - open {{item_name}}: To open an item and getting all the items inside of it in the inventory." << std::endl;
+        std::cout << "   - save {{item_name}} {{container_name}}: To put an item from hero inventory inside an item in the currently room or hero inventory." << std::endl;
         std::cout << "   - quit: To close the game." << std::endl;
     }
 }
@@ -261,15 +256,13 @@ void World::Look(const std::string& target_name) const {
 
         // List of exits
         std::cout << "Exits: ";
-        for (Entity* e : player->location->contains) {
-            if (e->type == EntityType::EXIT) {
-                std::cout << "(" << ((Exit*)e)->direction << ") ";
-            }
+        std::vector<Exit*> roomExits = player->location->GetExits();
+        for (Exit* ex : roomExits) {
+            std::cout << "\n - (" << ex->direction << "): " << ex->description;
         }
-        std::cout << "\n" << std::endl;
 
         // List of objects in the room
-        std::cout << "Items here: ";
+        std::cout << "\n Items here: ";
         bool itemsFound = false;
         for (Entity* e : player->location->contains) {
             if (e->type == EntityType::ITEM) {
@@ -488,8 +481,8 @@ void World::Battle(const std::string& enemy_name) {
     std::cout << "\n--- COMBAT! ---" << std::endl;
 
     // Player attacks first
-    std::cout << "You attack the " << enemy->name << " for " << player->GetPower() << " damage!" << std::endl;
-    enemy->TakeDamage(player->GetPower());
+    std::cout << "You strike the " << enemy->name << "!" << std::endl;
+    enemy->TakeDamage(player->GetAttackDamage());
 
     if (enemy->GetHealth() <= 0) {
         std::cout << "The " << enemy->name << " has been defeated!" << std::endl;
@@ -500,20 +493,24 @@ void World::Battle(const std::string& enemy_name) {
             std::cout << "\n*** VICTORY! Dracula has fallen. The castle is free! ***" << std::endl;
         }
 
+        if (enemy->name == "troll") {
+            player->location->description = "A dark and scary forest where you defeat the troll.";
+        }
+
         // Delete enemy from the ROOM but not from entities to avoid memory problems
         player->location->contains.remove(enemy);
     }
+
     else {
         // Enemy attack
-        std::cout << "The " << enemy->name << " counter-attacks! You lose " << enemy->GetPower() << " HP." << std::endl;
-        player->TakeDamage(enemy->GetPower());
+        enemy->Attack(player);
 
         if (player->GetHealth() <= 0) {
             game_over = true;
             std::cout << "You have been slain... GAME OVER." << std::endl;
         }
         else {
-            std::cout << "Your HP: " << player->GetHealth() << " | " << enemy->name << " HP: " << enemy->GetHealth() << std::endl;
+            std::cout << ">> [Hero HP: " << player->GetHealth() << "] [" << enemy->name << " HP: " << enemy->GetHealth() << "]" << std::endl;
         }
     }
 }
@@ -598,6 +595,34 @@ void World::Open(const std::string& target_name) {
     }
     else {
         std::cout << "That is not able to be opened." << std::endl;
+    }
+}
+
+
+void World::PutItemIn(const std::string& item_name, const std::string& container_name) {
+    Item* item_to_move = player->GetItem(item_name);
+    Entity* target_entity = FindEntity(container_name);
+
+    if (!item_to_move) {
+        std::cout << "You don't have that object." << std::endl;
+        return;
+    }
+
+    if (!target_entity) {
+        std::cout << "You can't find that here." << std::endl;
+        return;
+    }
+
+    // Try to treat the target as a container
+    Container* destination = dynamic_cast<Container*>(target_entity);
+
+    if (destination != nullptr) {
+        player->contains.remove(item_to_move);
+        destination->Put(item_to_move);
+        std::cout << "You have put " << item_to_move << " into " << destination <<"." << std::endl;
+    }
+    else {
+        std::cout << "You can't put things inside the " << container_name << "!" << std::endl;
     }
 }
 

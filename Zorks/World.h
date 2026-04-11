@@ -32,6 +32,7 @@ private:
     void Use(const std::string& item_name);
     void Solve(const std::string& riddle_answer);
     void Open(const std::string& target_name);
+    void PutItemIn(const std::string& item_name, const std::string& container_name);
     
 
     // Utils

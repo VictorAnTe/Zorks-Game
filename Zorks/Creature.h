@@ -7,7 +7,7 @@
 class Creature : public Entity {
 public:
     // Constructor
-    Creature(const std::string& name, const std::string& description, Room* location, int dmg = 0);
+    Creature(const std::string& name, const std::string& description, Entity* parent, int health_pts, int dmg);
 
     // Destructor (virtual because each kind of criature will have his own method)
     virtual ~Creature();
@@ -15,14 +15,12 @@ public:
     // Where is the criature
     Room* location;
 
-    // Possible interesting methods
-    void TakeDamage(const int dmg) { health = std::max(health - dmg, 0); }
-    virtual void RestoreHealth(const int hp_rest);
-    // virtual void Die();
-    // virtual void MoveTo(Room* destination);
+    virtual void Attack(Creature* target);
+    virtual void TakeDamage(const int dmg);
+    virtual int GetAttackDamage() const { return power; }
+    virtual void RestoreHealth(int amount) { health = std::min(health + amount, max_health); }
 
     int GetHealth() const { return health; }
-    int GetPower() const { return power; }
 
 protected:
     int health;
