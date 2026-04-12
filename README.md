@@ -5,7 +5,7 @@ An interactive fiction adventure developed for the Advanced Programming for AAA 
 
 ## Project & Authorship
 * **Author:** Víctor Andujar Terrón
-* **Repository:** [[Link to your GitHub]](https://github.com/VictorAnTe/Zorks-Game)
+* **Repository:** [[Link to GitHub]](https://github.com/VictorAnTe/Zorks-Game)
 * **License:** MIT License (Free for educational and personal use).
 
 ---
