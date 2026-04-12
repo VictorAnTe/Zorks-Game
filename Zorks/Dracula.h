@@ -9,6 +9,7 @@ public:
 
     // We design his own attacks
     void Attack(Creature* target);
+    bool Die() override;
 
 private:
     void VampiricBite(Creature* target);

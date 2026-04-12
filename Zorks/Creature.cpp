@@ -27,3 +27,8 @@ void Creature::TakeDamage(const int dmg) {
 
     std::cout << name << " takes " << dmg << " damage!" << std::endl;
 }
+
+bool Creature::Die()
+{
+    return false;
+}

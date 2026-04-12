@@ -9,14 +9,13 @@
 
 class World {
 public:
+    bool close_game = false;
     std::list<Entity*> entities; // The vector with all the instancies
     std::vector<Puzzle*> puzzles; // The vector with all the puzzles
     Player* player;                // Fast pointer to avoid searching the player all the time
 
     World();  // Constructor
     ~World(); // Destructor
-
-    bool game_over = false;
 
     void Update(const std::string& input); // Decides which function is needed to call
 
@@ -28,11 +27,14 @@ private:
     void Drop(const std::string& item_name);
     void Inventory() const;
     void Equip(const std::string& item_name);
+    void Unequip();
     void Battle(const std::string& enemy_name);
     void Use(const std::string& item_name);
     void Solve(const std::string& riddle_answer);
     void Open(const std::string& target_name);
     void PutItemIn(const std::string& item_name, const std::string& container_name);
+
+    void PrintWelcomeMessage();
     
 
     // Utils

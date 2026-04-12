@@ -3,6 +3,8 @@
 #include <vector>
 #include "World.h"
 
+const bool game_over = false;
+
 int main() {
     // Initialization of the world, we create one World that would contain a vector with each entity
     World myWorld;
@@ -11,7 +13,7 @@ int main() {
     bool isRunning = true;
 
     // Game Loop
-    while (myWorld.game_over == false) {
+    while (myWorld.close_game == false) {
         std::cout << "\n> ";
         std::getline(std::cin, userInput);
 

@@ -9,7 +9,8 @@ Dracula::Dracula(const std::string& name, const std::string& description, Entity
     std::srand(static_cast<unsigned int>(std::time(0)));
 }
 
-void Dracula::Attack(Creature* target) {
+void Dracula::Attack(Creature* target)
+{
     // Dracula health
     float healthPercent = (static_cast<float>(this->health) / this->max_health) * 100.0f;
 
@@ -49,7 +50,8 @@ void Dracula::Attack(Creature* target) {
 
 
 // Helper methods to keep Attack() clean
-void Dracula::VampiricBite(Creature* target) {
+void Dracula::VampiricBite(Creature* target)
+{
     std::cout << "Dracula sinks his fangs into your neck, draining your vitality!" << std::endl;
     target->TakeDamage(this->power);
 
@@ -58,7 +60,21 @@ void Dracula::VampiricBite(Creature* target) {
     std::cout << "Dracula heals for " << heal << " HP." << std::endl;
 }
 
-void Dracula::ShadowBolt(Creature* target) {
+void Dracula::ShadowBolt(Creature* target)
+{
     std::cout << "Dracula unleashes a bolt of pure darkness!" << std::endl;
     target->TakeDamage(static_cast<int>(this->power * 2.5));
+}
+
+bool Dracula::Die()
+{
+    std::cout << R"(
+     ____________________________________________________
+    |                                                    |
+    |              Dracula turns into dust...            |
+    |              The castle is free now!!!             |
+    |                     Victory!!!                     |
+    |____________________________________________________|)" << std::endl;
+
+    return true;
 }

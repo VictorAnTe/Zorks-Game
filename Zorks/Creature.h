@@ -19,6 +19,7 @@ public:
     virtual void TakeDamage(const int dmg);
     virtual int GetAttackDamage() const { return power; }
     virtual void RestoreHealth(int amount) { health = std::min(health + amount, max_health); }
+    virtual bool Die();
 
     int GetHealth() const { return health; }
 

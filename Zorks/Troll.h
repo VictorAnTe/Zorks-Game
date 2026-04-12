@@ -6,9 +6,15 @@
 class Troll : public Creature {
 public:
     Troll(const std::string& name, const std::string& description, Entity* parent);
+    
+    // We design his own attacks
+    void Attack(Creature* target);
+    bool Die() override;
 
-    // Each enemy has his own attack message
-    void AttackMessage() const;
+private:
+    void NormalSmash(Creature* target);
+    void HeavySmash(Creature* target);
+    void Regenerate();
 };
 
 #endif

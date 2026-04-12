@@ -153,7 +153,7 @@ World::World() {
     entities.push_back(player);
 
     // Mensaje inicial
-    std::cout << "--- WELCOME TO ZORKS ---\n" << std::endl;
+    PrintWelcomeMessage();
     Look();
 }
 
@@ -206,6 +206,9 @@ void World::Update(const std::string& input) {
         if (args.size() > 1) Equip(args[1]);
         else std::cout << "You need to specify what do you want to equip?" << std::endl;
     }
+    else if (action == "unequip") {
+        Unequip();
+    }
     else if (action == "battle") {
         if (args.size() > 1) Battle(args[1]);
         else std::cout << "You need to specify who do you want to battle with" << std::endl;
@@ -235,6 +238,7 @@ void World::Update(const std::string& input) {
         std::cout << "   - drop {{item_name}}: To leave an object from your inventory." << std::endl;
         std::cout << "   - inventory: Shows all the items from the hero inventory." << std::endl;
         std::cout << "   - equip {{item_name}}: To equip something from the hero inventory." << std::endl;
+        std::cout << "   - unequip: Unequipped the hero weapon." << std::endl;
         std::cout << "   - battle {{npc_name}}: To battle someone in the currently room." << std::endl;
         std::cout << "   - use {{item_name}}: To use something from the hero inventory." << std::endl;
         std::cout << "   - solve: To get information about the riddle from the currently room." << std::endl;
@@ -460,6 +464,9 @@ void World::Equip(const std::string& item_name) {
     }
 }
 
+void World::Unequip() {
+    player->UnequipWeapon();
+}
 
 void World::Battle(const std::string& enemy_name) {
     Creature* enemy = nullptr;
@@ -481,24 +488,10 @@ void World::Battle(const std::string& enemy_name) {
     std::cout << "\n--- COMBAT! ---" << std::endl;
 
     // Player attacks first
-    std::cout << "You strike the " << enemy->name << "!" << std::endl;
-    enemy->TakeDamage(player->GetAttackDamage());
+    player->Attack(enemy);
 
     if (enemy->GetHealth() <= 0) {
-        std::cout << "The " << enemy->name << " has been defeated!" << std::endl;
-
-        //Dracula defeat logic: If you defeat Dracula, you win the game
-        if (enemy->name == "dracula") {
-            game_over = true;
-            std::cout << "\n*** VICTORY! Dracula has fallen. The castle is free! ***" << std::endl;
-        }
-
-        if (enemy->name == "troll") {
-            player->location->description = "A dark and scary forest where you defeat the troll.";
-        }
-
-        // Delete enemy from the ROOM but not from entities to avoid memory problems
-        player->location->contains.remove(enemy);
+        close_game = enemy->Die();
     }
 
     else {
@@ -506,15 +499,13 @@ void World::Battle(const std::string& enemy_name) {
         enemy->Attack(player);
 
         if (player->GetHealth() <= 0) {
-            game_over = true;
-            std::cout << "You have been slain... GAME OVER." << std::endl;
+            close_game = player->Die();
         }
         else {
             std::cout << ">> [Hero HP: " << player->GetHealth() << "] [" << enemy->name << " HP: " << enemy->GetHealth() << "]" << std::endl;
         }
     }
 }
-
 
 void World::Use(const std::string& item_name) {
     Entity* e = FindEntity(item_name);
@@ -533,7 +524,6 @@ void World::Use(const std::string& item_name) {
         std::cout << "You can't eat/use the " << item_name << "!" << std::endl;
     }
 }
-
 
 void World::Solve(const std::string& riddle_answer) {
     // Si no hay puzzles en el mundo
@@ -559,7 +549,6 @@ void World::Solve(const std::string& riddle_answer) {
         }
     }
 }
-
 
 void World::Open(const std::string& target_name) {
     // Find del ITEM
@@ -598,7 +587,6 @@ void World::Open(const std::string& target_name) {
     }
 }
 
-
 void World::PutItemIn(const std::string& item_name, const std::string& container_name) {
     Item* item_to_move = player->GetItem(item_name);
     Entity* target_entity = FindEntity(container_name);
@@ -624,6 +612,24 @@ void World::PutItemIn(const std::string& item_name, const std::string& container
     else {
         std::cout << "You can't put things inside the " << container_name << "!" << std::endl;
     }
+}
+
+void World::PrintWelcomeMessage()
+{
+    // Using a Raw String Literal R"(...)" to handle multi-line ASCII art easily
+    std::cout << R"(
+     ____________________________________________________
+    |                                                    |
+    |                 --- WELCOME TO ---                 |
+    |                       ZORKS                        |
+    |____________________________________________________|
+        
+             To the brave belongs the kingdom.
+
+    ____________________________________________________
+
+        Prepare yourself, traveler. The quest begins...
+    ____________________________________________________)" << std::endl;
 }
 
 
