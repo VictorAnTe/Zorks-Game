@@ -1,0 +1,20 @@
+﻿  ConsumableItem.cpp
+  Container.cpp
+  Creature.cpp
+  Dracula.cpp
+  Entity.cpp
+  Exit.cpp
+  Item.cpp
+  KeyItem.cpp
+  main.cpp
+  Player.cpp
+  Puzzle.cpp
+  Room.cpp
+  Troll.cpp
+  WeaponItem.cpp
+  World.cpp
+  Generando código
+  Previous IPDB not found, fall back to full compilation.
+  All 532 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Generación de código finalizada
+  Zorks.vcxproj -> C:\Users\victo\source\repos\Zorks\Release\Zorks.exe

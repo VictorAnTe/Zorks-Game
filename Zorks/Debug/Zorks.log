@@ -1,0 +1,17 @@
+﻿  ConsumableItem.cpp
+  Container.cpp
+  Creature.cpp
+  Dracula.cpp
+  Entity.cpp
+  Exit.cpp
+  Item.cpp
+  KeyItem.cpp
+  main.cpp
+  Player.cpp
+  Puzzle.cpp
+  Room.cpp
+  Troll.cpp
+  WeaponItem.cpp
+  World.cpp
+  Generando código...
+  Zorks.vcxproj -> C:\Users\victo\source\repos\Zorks\Debug\Zorks.exe
