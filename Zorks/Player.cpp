@@ -121,3 +121,10 @@ bool Player::Die()
 
     return true;
 }
+
+void Player::PrintCreatureInfo()
+{
+    std::cout << this->description << std::endl;
+    std::cout << "MAX HP: " << this->GetMaxHealth() << " --- Currently HP: " << this->GetHealth() << std::endl;
+    std::cout << "Equipped Weapon: " << this->GetWeapon() << " --- Total DMG: " << this->GetAttackDamage() << std::endl;
+}

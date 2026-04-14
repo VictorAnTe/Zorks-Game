@@ -149,7 +149,7 @@ World::World() {
 
 
     // Create Player
-    player = new Player("Hero", "The main character of this story", livingRoom);
+    player = new Player("hero", "The main character of this story", livingRoom);
     entities.push_back(player);
 
     // Mensaje inicial
@@ -232,7 +232,7 @@ void World::Update(const std::string& input) {
     else {
         std::cout << "This command is not registered. The options are:" << std::endl;
         std::cout << "   - look: To get information about the room you are." << std::endl;
-        std::cout << "   - look {{item_name}}: To get information about that item." << std::endl;
+        std::cout << "   - look {{entity_name}}: To get information about that entity that is in the current room." << std::endl;
         std::cout << "   - go {{cardinal direction}}: To move to the exit of the room in that direction." << std::endl;
         std::cout << "   - get {{item_name}}: To pick the object specified from the floor." << std::endl;
         std::cout << "   - drop {{item_name}}: To leave an object from your inventory." << std::endl;
@@ -284,7 +284,21 @@ void World::Look(const std::string& target_name) const {
     else {
         Entity* target = FindEntity(target_name);
         if (target != nullptr) {
-            std::cout << target->description << std::endl;
+            // PLAYER
+            if (target->type == EntityType::PLAYER) {
+                Player* p = dynamic_cast<Player*>(target);
+                p->PrintCreatureInfo();
+            }
+
+            // CREATURE diff of PLAYER
+            else if (target->type == EntityType::CREATURE) {
+                Creature* c = dynamic_cast<Creature*>(target);
+                c->PrintCreatureInfo();
+            }
+            // ITEM/ENTITY
+            else {
+                std::cout << target->description << std::endl;
+            }
         }
         else {
             std::cout << "You don't see any '" << target_name << "' here." << std::endl;

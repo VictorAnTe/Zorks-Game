@@ -15,6 +15,7 @@ int main() {
     // Game Loop
     while (myWorld.close_game == false) {
         std::cout << "\n> ";
+        std::cout << "Currently Room: [" << myWorld.player->location->name << "] \n";
         std::getline(std::cin, userInput);
 
         if (userInput == "quit") break;

@@ -32,3 +32,8 @@ bool Creature::Die()
 {
     return false;
 }
+
+void Creature::PrintCreatureInfo()
+{
+    return;
+}

@@ -73,3 +73,11 @@ bool Troll::Die() {
 
     return false;
 }
+
+void Troll::PrintCreatureInfo()
+{
+    std::cout << this->description << std::endl;
+    std::cout << "HP: " << this->GetHealth() << "/" << this->GetMaxHealth() << std::endl;
+    std::cout << "Normal Smash Attack Power: " << this->GetAttackDamage() << std::endl;
+    std::cout << "Heavy Smash Attack Power: " << this->GetAttackDamage() * 2.0 << std::endl;
+}

@@ -10,6 +10,7 @@ public:
     // We design his own attacks
     void Attack(Creature* target);
     bool Die() override;
+    void PrintCreatureInfo() override;
 
 private:
     void NormalSmash(Creature* target);

@@ -24,6 +24,7 @@ public:
     }
     void RestoreHealth(int amount) override; 
     bool Die() override;
+    void PrintCreatureInfo() override;
 
 private:
     Item* equipped_weapon = nullptr;

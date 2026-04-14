@@ -20,8 +20,10 @@ public:
     virtual int GetAttackDamage() const { return power; }
     virtual void RestoreHealth(int amount) { health = std::min(health + amount, max_health); }
     virtual bool Die();
+    virtual void PrintCreatureInfo();
 
     int GetHealth() const { return health; }
+    int GetMaxHealth() const { return max_health; }
 
 protected:
     int health;

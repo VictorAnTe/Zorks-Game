@@ -11,6 +11,8 @@ public:
     void Attack(Creature* target);
     bool Die() override;
 
+    void PrintCreatureInfo() override;
+
 private:
     void VampiricBite(Creature* target);
     void ShadowBolt(Creature* target);

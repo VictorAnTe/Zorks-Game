@@ -20,13 +20,13 @@ void Dracula::Attack(Creature* target)
 
     // If Dracula health is under 35% is more probable to use Vampiric Bite attack
     if (healthPercent < 35.0f) {
-        // Desperation Mode: 80% chance to Bite (0-79)
-        biteThreshold = 80;
+        // Desperation Mode: 70% chance to Bite (0-79)
+        biteThreshold = 70;
         std::cout << "Dracula's eyes glow with a feral hunger as he weakens!" << std::endl;
     }
     else {
-        // Normal Mode: 50% chance to Bite (0-49)
-        biteThreshold = 50;
+        // Normal Mode: 40% chance to Bite (0-49)
+        biteThreshold = 40;
     }
 
 
@@ -39,7 +39,7 @@ void Dracula::Attack(Creature* target)
         }
     }
     else {
-        if (moveRoll < 50) {
+        if (moveRoll < 30) {
             ShadowBolt(target);
         }
         else {
@@ -77,4 +77,12 @@ bool Dracula::Die()
     |____________________________________________________|)" << std::endl;
 
     return true;
+}
+
+void Dracula::PrintCreatureInfo()
+{
+    std::cout << this->description << std::endl;
+    std::cout << "HP: " << this->GetHealth() << "/" << this->GetMaxHealth() << std::endl;
+    std::cout << "Vampire Bite Attack Power: " << this->GetAttackDamage() << std::endl;
+    std::cout << "Shadow Bolt Attack Power: " << this->GetAttackDamage() * 2.5 << std::endl;
 }
