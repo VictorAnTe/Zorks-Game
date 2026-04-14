@@ -55,3 +55,21 @@ To defeat the darkness of the castle, follow these strategic steps:
 4.  **The Final Encounter:** The game concludes when you defeat **Dracula** in his inner sanctum.
     * *Pro Tip:* Combat involves **RNG** (luck). Ensure your health is at maximum before initiating the final battle.
     * *Pro Tip:* Combat is turn by turn mode, but you can health in the combat without being damage.
+5.  **List of Entities:** I also leave here a list of every entity name to make easier use **`look`** command:
+    * hero
+    * dracula
+    * troll
+    * chest
+    * medicine_cabinet
+    * wood_key
+    * apple
+    * bandages 
+    * sword
+    * spells_book
+    * livinroom
+    * bathroom
+    * garden
+    * forest
+    * shed
+    * castleEntry
+    * insideCastle
