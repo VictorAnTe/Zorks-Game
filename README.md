@@ -66,10 +66,3 @@ To defeat the darkness of the castle, follow these strategic steps:
     * bandages 
     * sword
     * spells_book
-    * livinroom
-    * bathroom
-    * garden
-    * forest
-    * shed
-    * castleEntry
-    * insideCastle
